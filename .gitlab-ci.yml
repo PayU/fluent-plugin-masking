@@ -1,0 +1,60 @@
+image: ruby:2.6.3
+
+stages:
+- build
+- test
+- release
+
+variables:
+  DOCKER_TLS_CERTDIR: ""
+
+before_script:
+- echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
+cache-modules:
+  tags:
+  - dcos-multi-runner
+  stage: build
+  script:
+  - bundle install --path vendor/bundle
+  artifacts:
+    when: on_success
+    expire_in: 1 day
+    paths:
+      - vendor/
+  except:
+  - tags
+
+unit-test:
+  tags:
+  - dcos-multi-runner
+  stage: test
+  script:
+  - bundle exec rake test
+  except:
+  - tags
+
+.release: &release
+  tags:
+  - dcos-multi-runner
+  stage: release
+  script:
+  - echo "Setup ssh inside the runner.."
+  when: manual
+  only:
+  - master
+
+release:patch:
+  extends: .release
+  variables:
+    TYPE: patch
+
+release:minor:
+  extends: .release
+  variables:
+    TYPE: minor
+
+release:major:
+  extends: .release
+  variables:
+    TYPE: major
