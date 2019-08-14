@@ -1,26 +1,36 @@
 image: ruby:2.6.3
 
+
+# Cache gems in between builds
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - vendor/ruby
+
+before_script:
+  - ruby -v                                   # Print out ruby version for debugging
+  - bundle install -j $(nproc) --path vendor  # Install dependencies into ./vendor/ruby
+
 stages:
-- build
 - test
 - release
 
 variables:
   DOCKER_TLS_CERTDIR: ""
 
-cache-modules:
-  tags:
-  - dcos-multi-runner
-  stage: build
-  script:
-  - bundle install --path vendor/bundle
-  artifacts:
-    when: on_success
-    expire_in: 1 day
-    paths:
-      - vendor/
-  except:
-  - tags
+# cache-dependencies:
+#   tags:
+#   - dcos-multi-runner
+#   stage: build
+#   script:
+#   - bundle install --path vendor/bundle
+#   artifacts:
+#     when: on_success
+#     expire_in: 1 day
+#     paths:
+#       - vendor/
+#   except:
+#   - tags
 
 unit-test:
   tags:
