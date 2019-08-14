@@ -4,7 +4,7 @@ require "test-unit"
 require "fluent/test"
 require "fluent/test/driver/filter"
 require "fluent/test/helpers"
-require "/Users/nivlipetz/Documents/sre/logs-infra/fluentd-docker/custom-plugins/filter_masking.rb"
+require "./lib/fluent/plugin/filter_masking.rb"
 
 MASK_STRING = "*******"
 
