@@ -18,20 +18,6 @@ stages:
 variables:
   DOCKER_TLS_CERTDIR: ""
 
-# cache-dependencies:
-#   tags:
-#   - dcos-multi-runner
-#   stage: build
-#   script:
-#   - bundle install --path vendor/bundle
-#   artifacts:
-#     when: on_success
-#     expire_in: 1 day
-#     paths:
-#       - vendor/
-#   except:
-#   - tags
-
 unit-test:
   tags:
   - dcos-multi-runner
@@ -46,7 +32,8 @@ unit-test:
   - dcos-multi-runner
   stage: release
   script:
-  - echo "Setup ssh inside the runner.."
+  - gem install gem-release
+  - GEM_HOST_API_KEY=$GEM_HOST_API_KEY gem bump fluent-plugin-masking --version $TYPE --commit --push --tag --release 
   when: manual
   only:
   - master
