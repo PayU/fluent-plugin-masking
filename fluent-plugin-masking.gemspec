@@ -1,9 +1,11 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+require ('./lib/fluent/plugin/version.rb')
+
 Gem::Specification.new do |spec|
   spec.name          = "fluent-plugin-masking"
-  spec.version       = "1.0.2"
+  spec.version       = FilterMasking::VERSION
 
   spec.authors       = ["Shai Moria", "Niv Lipetz"]
   spec.email         = ["shai.moria@zooz.com", "niv.lipetz@zooz.com"]
