@@ -1,6 +1,5 @@
 image: ruby:2.6.3
 
-
 # Cache gems in between builds
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -31,13 +30,33 @@ unit-test:
   tags:
   - dcos-multi-runner
   stage: release
-  script:
+  before_script:
+    - echo "Setup ssh inside the runner.."
+    - git config --global user.email $GITLAB_USER_EMAIL
+    - git config --global user.name $GITLAB_USER_LOGIN
+    - 'which ssh-agent || ( apk --update add openssh-client )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - echo "Clone the source code.."
+    - GIT_URL=$(echo $CI_PROJECT_URL | cut -d'/' -f3)
+    - git clone git@$GIT_URL:$CI_PROJECT_PATH.git
+    - cd $CI_PROJECT_NAME
+    - git reset --hard $CI_COMMIT_SHA
+  script: 
+  - mkdir -p ~/.gem
+  - 'echo -e "---\n:rubygems_api_key: $GEM_HOST_API_KEY" > ~/.gem/credentials && echo "created gem credentials"'
+  - chmod 0600 ~/.gem/credentials
   - gem install gem-release
-  - GEM_HOST_API_KEY=$GEM_HOST_API_KEY gem bump fluent-plugin-masking --version $TYPE --commit --push --tag --release 
+  - gem bump fluent-plugin-masking --version $TYPE --file ./lib/fluent/plugin/version.rb --commit 
+  # - gem release fluent-plugin-masking --push --key rubygems_api_key 
+  - export VERSION=$(cat ./lib/fluent/plugin/version.rb | grep VERSION | sed -ne 's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p' | sed 's/"$//')
+  - gem push fluent-plugin-masking-$VERSION.gem
   when: manual
   only:
   - master
-
+  
 release:patch:
   extends: .release
   variables:
