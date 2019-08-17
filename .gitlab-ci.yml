@@ -49,9 +49,11 @@ unit-test:
   - 'echo -e "---\n:rubygems_api_key: $GEM_HOST_API_KEY" > ~/.gem/credentials && echo "created gem credentials"'
   - chmod 0600 ~/.gem/credentials
   - gem install gem-release
-  - gem bump fluent-plugin-masking --version $TYPE --file ./lib/fluent/plugin/version.rb --commit 
-  # - gem release fluent-plugin-masking --push --key rubygems_api_key 
-  - export VERSION=$(cat ./lib/fluent/plugin/version.rb | grep VERSION | sed -ne 's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p' | sed 's/"$//')
+  - gem bump fluent-plugin-masking --version $TYPE --file ./lib/fluent/plugin/version.rb --no-commit
+  # - gem release fluent-plugin-masking --push --key rubygems_api_key
+  - gem build fluent-plugin-masking.gemspec
+  - export VERSION=$(gem bump --pretend --file ./lib/fluent/plugin/version.rb --no-commit | awk '{ print $4 }')
+#  - export VERSION=$(cat ./lib/fluent/plugin/version.rb | grep VERSION | sed -ne 's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p' | sed 's/"$//')
   - gem push fluent-plugin-masking-$VERSION.gem
   when: manual
   only:
