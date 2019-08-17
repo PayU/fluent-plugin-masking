@@ -11,24 +11,24 @@ before_script:
   - bundle install -j $(nproc) --path vendor  # Install dependencies into ./vendor/ruby
 
 stages:
-- test
-- release
+  - test
+  - release
 
 variables:
   DOCKER_TLS_CERTDIR: ""
 
 unit-test:
   tags:
-  - dcos-multi-runner
+    - dcos-multi-runner
   stage: test
   script:
-  - bundle exec rake test
+    - bundle exec rake test
   except:
-  - tags
+    - tags
 
 .release: &release
   tags:
-  - dcos-multi-runner
+    - dcos-multi-runner
   stage: release
   before_script:
     - echo "Setup ssh inside the runner.."
@@ -45,19 +45,17 @@ unit-test:
     - cd $CI_PROJECT_NAME
     - git reset --hard $CI_COMMIT_SHA
   script: 
-  - mkdir -p ~/.gem
-  - 'echo -e "---\n:rubygems_api_key: $GEM_HOST_API_KEY" > ~/.gem/credentials && echo "created gem credentials"'
-  - chmod 0600 ~/.gem/credentials
-  - gem install gem-release
-  - gem bump fluent-plugin-masking --version $TYPE --file ./lib/fluent/plugin/version.rb --commit --push
-  # - gem release fluent-plugin-masking --push --key rubygems_api_key
-  - gem build fluent-plugin-masking.gemspec
-#  - export VERSION=$(gem bump --pretend --file ./lib/fluent/plugin/version.rb --no-commit | awk '{ print $4 }')
-  - export VERSION=$(cat ./lib/fluent/plugin/version.rb | grep VERSION | sed -ne 's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p' | sed 's/"$//')
-  - gem push fluent-plugin-masking-$VERSION.gem
+    - mkdir -p ~/.gem
+    - 'echo -e "---\n:rubygems_api_key: $GEM_HOST_API_KEY" > ~/.gem/credentials && echo "created gem credentials"'
+    - chmod 0600 ~/.gem/credentials
+    - gem install gem-release
+    - gem bump fluent-plugin-masking --version $TYPE --file ./lib/fluent/plugin/version.rb --commit --push --tag
+    - gem build fluent-plugin-masking.gemspec
+    - export VERSION=$(cat ./lib/fluent/plugin/version.rb | grep VERSION | sed -ne 's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p' | sed 's/"$//')
+    - gem push fluent-plugin-masking-$VERSION.gem
   when: manual
   only:
-  - master
+    - master
   
 release:patch:
   extends: .release
