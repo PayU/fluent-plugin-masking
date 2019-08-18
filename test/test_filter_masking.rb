@@ -32,23 +32,22 @@ class YourOwnFilterTest < Test::Unit::TestCase
     d.filtered_records
   end
 
-  # sub_test_case 'configured with invalid configuration' do
-  #   test 'empty configuration' do
-  #     assert_raise(Fluent::ConfigError) do
-  #        create_driver('')
-  #     end
-  #   end
+  sub_test_case 'configured with invalid configuration' do
+    test 'empty configuration' do
+      assert_raise(Fluent::ConfigError) do
+         create_driver('')
+      end
+    end
 
-  #   test 'param1 should reject too short string' do
-  #     conf = %[
-  #       param1 a
-  #     ]
-  #     assert_raise(Fluent::ConfigError) do
-  #        create_driver(conf)
-  #     end
-  #   end
-  #   # ...
-  # end
+    test 'param1 should reject too short string' do
+      conf = %[
+        param1 a
+      ]
+      assert_raise(Fluent::ConfigError) do
+         create_driver(conf)
+      end
+    end
+  end
 
   sub_test_case 'plugin will mask all fields that need masking' do
     test 'mask first_name and last_name' do

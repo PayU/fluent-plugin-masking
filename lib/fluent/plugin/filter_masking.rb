@@ -41,6 +41,11 @@ module Fluent
       # this method only called ones (on startup time)
       def configure(conf)
         super
+
+        if !conf['fieldsToMaskFilePath'] || (conf['fieldsToMaskFilePath'] && conf['fieldsToMaskFilePath'].empty?)
+          raise Fluent::ConfigError, "no path to masked fields file provided"
+        end
+
         fieldsToMaskFilePath = conf['fieldsToMaskFilePath']
 
         File.open(fieldsToMaskFilePath, "r") do |f|
