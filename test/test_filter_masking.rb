@@ -90,10 +90,10 @@ class YourOwnFilterTest < Test::Unit::TestCase
     test 'mask nested jsons' do
       conf = CONFIG
       messages = [
-        { "body" => "{\"firstname\":\"mickey\",\"first_name\":\"mickey\"}" }
+        { "body" => "{\"first_name\":\"mickey\",\"last_name\":\"the-dog\"}" }
       ]
       expected = [
-        { "body" => "{\"firstname\":\"*******\",\"first_name\":\"*******\"}" }
+        { "body" => "{\"first_name\":\"*******\",\"last_name\":\"*******\"}" }
       ]
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
