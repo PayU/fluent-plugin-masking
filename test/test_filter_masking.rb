@@ -6,6 +6,7 @@ require "fluent/test/driver/filter"
 require "fluent/test/helpers"
 require "./lib/fluent/plugin/filter_masking.rb"
 
+
 MASK_STRING = "*******"
 
 class YourOwnFilterTest < Test::Unit::TestCase
@@ -32,56 +33,14 @@ class YourOwnFilterTest < Test::Unit::TestCase
     d.filtered_records
   end
 
-  # sub_test_case 'configured with invalid configuration' do
-  #   test 'empty configuration' do
-  #     assert_raise(Fluent::ConfigError) do
-  #        create_driver('')
-  #     end
-  #   end
-
-  #   test 'param1 should reject too short string' do
-  #     conf = %[
-  #       param1 a
-  #     ]
-  #     assert_raise(Fluent::ConfigError) do
-  #        create_driver(conf)
-  #     end
-  #   end
-  #   # ...
-  # end
-
   sub_test_case 'plugin will mask all fields that need masking' do
-    test 'mask first_name and last_name' do
-      conf = CONFIG
-      messages = [
-        { "first_name" => "mickey", "last_name" => "the-dog" }
-      ]
-      expected = [
-        { "first_name" => MASK_STRING, "last_name" => MASK_STRING }
-      ]
-      filtered_records = filter(conf, messages)
-      assert_equal(expected, filtered_records)
-    end
-
     test 'mask only email' do
       conf = CONFIG
       messages = [
-        { "not_masked_field" => "mickey-the-dog", "email" => "mickey-the-dog@zooz.com" }
+        {:not_masked_field=>"mickey-the-dog", :email=>"mickey-the-dog@zooz.com"}
       ]
       expected = [
-        { "not_masked_field" => "mickey-the-dog", "email" => MASK_STRING }
-      ]
-      filtered_records = filter(conf, messages)
-      assert_equal(expected, filtered_records)
-    end
-
-    test 'mask nothing' do
-      conf = CONFIG
-      messages = [
-        { "not_masked_field_1" => "mickey-the-dog", "not_masked_field_2" => "nully_the_carpet" }
-      ]
-      expected = [
-        { "not_masked_field_1" => "mickey-the-dog", "not_masked_field_2" => "nully_the_carpet" }
+        {:not_masked_field=>"mickey-the-dog", :email=>MASK_STRING}
       ]
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
