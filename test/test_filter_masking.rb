@@ -6,6 +6,7 @@ require "fluent/test/driver/filter"
 require "fluent/test/helpers"
 require "./lib/fluent/plugin/filter_masking.rb"
 
+
 MASK_STRING = "*******"
 
 class YourOwnFilterTest < Test::Unit::TestCase
@@ -32,56 +33,50 @@ class YourOwnFilterTest < Test::Unit::TestCase
     d.filtered_records
   end
 
-  # sub_test_case 'configured with invalid configuration' do
-  #   test 'empty configuration' do
-  #     assert_raise(Fluent::ConfigError) do
-  #        create_driver('')
-  #     end
-  #   end
-
-  #   test 'param1 should reject too short string' do
-  #     conf = %[
-  #       param1 a
-  #     ]
-  #     assert_raise(Fluent::ConfigError) do
-  #        create_driver(conf)
-  #     end
-  #   end
-  #   # ...
-  # end
-
   sub_test_case 'plugin will mask all fields that need masking' do
-    test 'mask first_name and last_name' do
+    test 'mask field in hash object' do
       conf = CONFIG
       messages = [
-        { "first_name" => "mickey", "last_name" => "the-dog" }
+        {:not_masked_field=>"mickey-the-dog", :email=>"mickey-the-dog@zooz.com"}
       ]
       expected = [
-        { "first_name" => MASK_STRING, "last_name" => MASK_STRING }
+        {:not_masked_field=>"mickey-the-dog", :email=>MASK_STRING}
       ]
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
     end
 
-    test 'mask only email' do
+    test 'mask field in json string' do
       conf = CONFIG
       messages = [
-        { "not_masked_field" => "mickey-the-dog", "email" => "mickey-the-dog@zooz.com" }
+        { :body => "{\"first_name\":\"mickey\",\"last_name\":\"the-dog\", \"type\":\"puggle\"}" }
       ]
       expected = [
-        { "not_masked_field" => "mickey-the-dog", "email" => MASK_STRING }
+        { :body => "{\"first_name\":\"*******\",\"last_name\":\"*******\", \"type\":\"puggle\"}" }
       ]
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
     end
 
-    test 'mask nothing' do
+    test 'mask field in nested json string' do
       conf = CONFIG
       messages = [
-        { "not_masked_field_1" => "mickey-the-dog", "not_masked_field_2" => "nully_the_carpet" }
+        { :body => "{\"first_name\":\"mickey\",\"last_name\":\"the-dog\",\"address\":\"{\"street\":\"Austin\",\"number\":\"89\"}\", \"type\":\"puggle\"}" } 
       ]
       expected = [
-        { "not_masked_field_1" => "mickey-the-dog", "not_masked_field_2" => "nully_the_carpet" }
+        { :body => "{\"first_name\":\"*******\",\"last_name\":\"*******\",\"address\":\"{\"street\":\"*******\",\"number\":\"*******\"}\", \"type\":\"puggle\"}" }
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+
+    test 'mask field in nested json escaped strubg' do
+      conf = CONFIG
+      messages = [
+        { :body => "{\"first_name\":\"mickey\",\"last_name\":\"the-dog\",\"address\":\"{\\\"street\":\\\"Austin\\\",\\\"number\":\\\"89\\\"}\", \"type\":\"puggle\"}" } 
+      ]
+      expected = [
+        { :body => "{\"first_name\":\"*******\",\"last_name\":\"*******\",\"address\":\"{\"street\":\"*******\",\"number\":\"*******\"}\", \"type\":\"puggle\"}" }
       ]
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
