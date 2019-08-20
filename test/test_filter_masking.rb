@@ -69,5 +69,17 @@ class YourOwnFilterTest < Test::Unit::TestCase
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
     end
+
+    test 'mask field in nested json escaped strubg' do
+      conf = CONFIG
+      messages = [
+        { :body => "{\"first_name\":\"mickey\",\"last_name\":\"the-dog\",\"address\":\"{\\\"street\":\\\"Austin\\\",\\\"number\":\\\"89\\\"}\", \"type\":\"puggle\"}" } 
+      ]
+      expected = [
+        { :body => "{\"first_name\":\"*******\",\"last_name\":\"*******\",\"address\":\"{\"street\":\"*******\",\"number\":\"*******\"}\", \"type\":\"puggle\"}" }
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
   end
 end
