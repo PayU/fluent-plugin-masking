@@ -58,6 +58,18 @@ class YourOwnFilterTest < Test::Unit::TestCase
       assert_equal(expected, filtered_records)
     end
 
+    test 'mask field in hash object and in json string' do
+      conf = CONFIG
+      messages = [
+        { :msg=>"sup", :email=>"mickey-the-dog@zooz.com", :body => "{\"first_name\":\"mickey\", \"type\":\"puggle\", \"last_name\":\"the-dog\"}", :status_code=>201, :password=>"d0g!@"}
+      ]
+      expected = [
+        { :msg=>"sup", :email=>MASK_STRING, :body => "{\"first_name\":\"*******\", \"type\":\"puggle\", \"last_name\":\"*******\"}", :status_code=>201, :password=>MASK_STRING }
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+
     test 'mask field in nested json string' do
       conf = CONFIG
       messages = [
@@ -70,7 +82,7 @@ class YourOwnFilterTest < Test::Unit::TestCase
       assert_equal(expected, filtered_records)
     end
 
-    test 'mask field in nested json escaped strubg' do
+    test 'mask field in nested json escaped string' do
       conf = CONFIG
       messages = [
         { :body => "{\"first_name\":\"mickey\",\"last_name\":\"the-dog\",\"address\":\"{\\\"street\":\\\"Austin\\\",\\\"number\":\\\"89\\\"}\", \"type\":\"puggle\"}" } 
