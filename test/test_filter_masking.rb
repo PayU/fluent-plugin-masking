@@ -34,7 +34,7 @@ class YourOwnFilterTest < Test::Unit::TestCase
   end
 
   sub_test_case 'plugin will mask all fields that need masking' do
-    test 'mask only email' do
+    test 'mask field in hash object' do
       conf = CONFIG
       messages = [
         {:not_masked_field=>"mickey-the-dog", :email=>"mickey-the-dog@zooz.com"}
@@ -46,13 +46,25 @@ class YourOwnFilterTest < Test::Unit::TestCase
       assert_equal(expected, filtered_records)
     end
 
-    test 'mask nested jsons' do
+    test 'mask field in json string' do
       conf = CONFIG
       messages = [
         { :body => "{\"first_name\":\"mickey\",\"last_name\":\"the-dog\", \"type\":\"puggle\"}" }
       ]
       expected = [
         { :body => "{\"first_name\":\"*******\",\"last_name\":\"*******\", \"type\":\"puggle\"}" }
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+
+    test 'mask field in nested json string' do
+      conf = CONFIG
+      messages = [
+        { :body => "{\"first_name\":\"mickey\",\"last_name\":\"the-dog\",\"address\":\"{\"street\":\"Austin\",\"number\":\"89\"}\", \"type\":\"puggle\"}" } 
+      ]
+      expected = [
+        { :body => "{\"first_name\":\"*******\",\"last_name\":\"*******\",\"address\":\"{\"street\":\"*******\",\"number\":\"*******\"}\", \"type\":\"puggle\"}" }
       ]
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
