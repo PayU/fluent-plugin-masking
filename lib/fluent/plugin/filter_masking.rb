@@ -21,7 +21,7 @@ module Fluent
           recordStr = record.to_s
           @fields_to_mask.each do | fieldToMask |
             recordStr = recordStr.gsub(/(?::#{fieldToMask}=>")(.*?)(?:")/m, ":#{fieldToMask}=>\"#{MASK_STRING}\"") # mask element in hash object
-            recordStr = recordStr.gsub(/\\+"#{fieldToMask}\\+":\\+.+?((?=(})|,( *|)(\s|\\+)\")|(?=}"$))/m, "\\\"#{fieldToMask}\\\":\\\"#{MASK_STRING}\\\"") # mask element in json string
+            recordStr = recordStr.gsub(/(\\+)"#{fieldToMask}\\+":\\+.+?((?=(})|,( *|)(\s|\\+)\")|(?=}"$))/m, "\\1\"#{fieldToMask}\\1\":\\1\"#{MASK_STRING}\\1\"") # mask element in json string
           end
 
           maskedRecord = strToHash(recordStr)
