@@ -15,7 +15,7 @@ Install with gem:
 `gem install fluent-plugin-masking`
 
 ## Setup
-In order to setup this plugin, the paremeter `fieldsToMaskFilePath` needs to be a valid path to a file containing a list of all the fields that need to be masked. The file should have a unique field on each line in the file. These fields **are** case-sensitive (`Name` != `name`).
+In order to setup this plugin, the parameter `fieldsToMaskFilePath` needs to be a valid path to a file containing a list of all the fields to mask. The file should have a unique field on each line. These fields **are** case-sensitive (`Name` != `name`).
 
 This is configured as shown below:
 ```
