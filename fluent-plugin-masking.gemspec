@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
 
   spec.authors       = ["Shai Moria", "Niv Lipetz"]
   spec.email         = ["shai.moria@zooz.com", "niv.lipetz@zooz.com"]
-  spec.description   = "Fluentd Filter plugin to mask given fields in messages"
-  spec.summary       = "Fluentd Filter plugin to mask given fields in messages"
-  spec.homepage      = "https://github.com/zooz"
+  spec.description   = "Fluentd filter plugin to mask sensitive or privacy records in event messages"
+  spec.summary       = "Fluentd filter plugin to mask sensitive or privacy records with `*******` in place of the original value. This data masking plugin protects data such as name, email, phonenumber, address, and any other field you would like to mask."
+  spec.homepage      = "https://github.com/zooz/fluent-plugin-masking"
 
   spec.files         = `git ls-files`.split($\)
   spec.require_paths = ["lib"]
@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.1'
   
-  spec.add_runtime_dependency "fluentd", ">= 0.14.0", "< 2"
+  spec.add_runtime_dependency "fluentd", ">= 0.14.0"
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake", "~> 12.0"
   spec.add_development_dependency "test-unit", ">= 3.1.0"
