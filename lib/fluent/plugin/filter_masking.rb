@@ -6,22 +6,23 @@ module Fluent
       Fluent::Plugin.register_filter("masking", self) # for "@type masking" in configuration
 
       MASK_STRING = "*******"
+      hashObjectRegex = new RegExp(/(?::#{fieldToMask}=>")(.*?)(?:")/m)
+      innerJSONStringRegex = new RegExp(/(\\+)"#{fieldToMask}\\+":\\+.+?((?=(})|,( *|)(\s|\\+)\")|(?=}"$))/m)
 
       def strToHash(str)
         eval(str)
       end
 
       # returns the masked record
-      # error safe method - if any error occurs
-      # the original record is return
+      # error safe method - if any error occurs the original record is returned
       def maskRecord(record)
         maskedRecord = record
         
         begin
           recordStr = record.to_s
           @fields_to_mask.each do | fieldToMask |
-            recordStr = recordStr.gsub(/(?::#{fieldToMask}=>")(.*?)(?:")/m, ":#{fieldToMask}=>\"#{MASK_STRING}\"") # mask element in hash object
-            recordStr = recordStr.gsub(/(\\+)"#{fieldToMask}\\+":\\+.+?((?=(})|,( *|)(\s|\\+)\")|(?=}"$))/m, "\\1\"#{fieldToMask}\\1\":\\1\"#{MASK_STRING}\\1\"") # mask element in json string
+            recordStr = recordStr.gsub(hashObjectRegex, ":#{fieldToMask}=>\"#{MASK_STRING}\"") # mask element in hash object
+            recordStr = recordStr.gsub(innerJSONStringRegex, "\\1\"#{fieldToMask}\\1\":\\1\"#{MASK_STRING}\\1\"") # mask element in json string using capture groups that count the level of escaping inside the json string
           end
 
           maskedRecord = strToHash(recordStr)
