@@ -6,8 +6,6 @@ module Fluent
       Fluent::Plugin.register_filter("masking", self) # for "@type masking" in configuration
 
       MASK_STRING = "*******"
-      hashObjectRegex = new RegExp(/(?::#{fieldToMask}=>")(.*?)(?:")/m)
-      innerJSONStringRegex = new RegExp(/(\\+)"#{fieldToMask}\\+":\\+.+?((?=(})|,( *|)(\s|\\+)\")|(?=}"$))/m)
 
       def strToHash(str)
         eval(str)
@@ -20,9 +18,8 @@ module Fluent
         
         begin
           recordStr = record.to_s
-          @fields_to_mask.each do | fieldToMask |
-            recordStr = recordStr.gsub(hashObjectRegex, ":#{fieldToMask}=>\"#{MASK_STRING}\"") # mask element in hash object
-            recordStr = recordStr.gsub(innerJSONStringRegex, "\\1\"#{fieldToMask}\\1\":\\1\"#{MASK_STRING}\\1\"") # mask element in json string using capture groups that count the level of escaping inside the json string
+          @fields_to_mask_regex.each do | fieldToMaskRegex, fieldToMaskRegexStringReplacement |
+            recordStr = recordStr.gsub(fieldToMaskRegex, fieldToMaskRegexStringReplacement) 
           end
 
           maskedRecord = strToHash(recordStr)
@@ -37,6 +34,7 @@ module Fluent
       def initialize
         super
         @fields_to_mask = []
+        @fields_to_mask_regex = {}
       end
 
       # this method only called ones (on startup time)
@@ -52,6 +50,14 @@ module Fluent
             value = value.gsub('\n', '') # remove line breakers
 
             @fields_to_mask.push(value)
+
+            hashObjectRegex = Regexp.new(/(?::#{value}=>")(.*?)(?:")/m) # mask element in hash object
+            hashObjectRegexStringReplacement = ":#{value}=>\"#{MASK_STRING}\""
+            @fields_to_mask_regex[hashObjectRegex] = hashObjectRegexStringReplacement
+
+            innerJSONStringRegex = Regexp.new(/(\\+)"#{value}\\+":\\+.+?((?=(})|,( *|)(\s|\\+)\")|(?=}"$))/m) # mask element in json string using capture groups that count the level of escaping inside the json string
+            innerJSONStringRegexStringReplacement = "\\1\"#{value}\\1\":\\1\"#{MASK_STRING}\\1\""
+            @fields_to_mask_regex[innerJSONStringRegex] = innerJSONStringRegexStringReplacement
           end
         end
 
