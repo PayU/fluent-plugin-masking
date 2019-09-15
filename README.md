@@ -25,7 +25,7 @@ This is configured as shown below:
 </filter>
 ```
 
-Example file:
+Example fields-to-mask-file:
 ```
 name
 email
@@ -40,12 +40,11 @@ phone
 # fluent.conf
 ----------------------------------
 <source>
-  @type dummy
+  @type tail
+  path /tmp/test.log
+  pos_file /tmp/test.log.pos
   tag maskme
-  dummy [
-      {"id": "1", "first_name":"Mickey", "last_name": "Thedog", "title": "Mr."},
-      {"id": "2", "first_name":"Nully", "last_name": "Null", "title": "Ms.", "address": "Earth", "age": 4, "phone": "+1(863)-382-3888"}      
-    ]
+  format none
 </source>
 
 <filter "**">
@@ -65,12 +64,20 @@ first_name
 last_name
 address
 phone
+password
+email
 ```
 
 ### Result
+
+To run the above configuration, run the following commands:
+```
+fluentd -c fluent.conf
+echo '{ :body => "{\"first_name\":\"mickey\", \"type\":\"puggle\", \"last_name\":\"the-dog\", \"password\":\"d0g43u39\"}"}' > /tmp/test.log
+```
+
 This sample result is created from the above configuration file `fluent.conf`. As expected, the following fields configured to be masked are masked with `*******` in the output.
 
 ```
-2019-09-05 17:35:09.072275000 +0300 maskme: {"id":"1","first_name":"*******","last_name":"*******","title":"Mr."}
-2019-09-05 17:35:10.095184000 +0300 maskme: {"id":"2","first_name":"*******","last_name":"*******","title":"Ms.","address":"*******","age":4,"phone":"*******"}
+2019-09-15 16:12:50.359191000 +0300 maskme: {"message":"{ :body => \"{\\\"first_name\\\":\\\"*******\\\", \\\"type\\\":\\\"puggle\\\", \\\"last_name\\\":\\\"*******\\\", \\\"password\\\":\\\"*******\\\"}\"}"}
 ```
