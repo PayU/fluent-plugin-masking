@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["shai.moria@zooz.com", "niv.lipetz@zooz.com"]
   spec.description   = "Fluentd filter plugin to mask sensitive or privacy records in event messages"
   spec.summary       = "Fluentd filter plugin to mask sensitive or privacy records with `*******` in place of the original value. This data masking plugin protects data such as name, email, phonenumber, address, and any other field you would like to mask."
-  spec.homepage      = "https://github.com/zooz/fluent-plugin-masking"
+  spec.homepage      = "https://github.com/PayU/fluent-plugin-masking"
 
   spec.files         = `git ls-files`.split($\)
   spec.require_paths = ["lib"]
