@@ -1,23 +1,24 @@
 PATH
   remote: .
   specs:
-    fluent-plugin-masking (1.0.6)
+    fluent-plugin-masking (1.0.7)
       fluentd (>= 0.14.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    concurrent-ruby (1.1.5)
     cool.io (1.5.4)
     dig_rb (1.0.1)
-    fluentd (1.6.3)
+    fluentd (1.7.2)
       cool.io (>= 1.4.5, < 2.0.0)
       dig_rb (~> 1.0.0)
       http_parser.rb (>= 0.5.1, < 0.7.0)
-      msgpack (>= 0.7.0, < 2.0.0)
+      msgpack (>= 1.2.0, < 2.0.0)
       serverengine (>= 2.0.4, < 3.0.0)
       sigdump (~> 0.2.2)
       strptime (>= 0.2.2, < 1.0.0)
-      tzinfo (~> 1.0)
+      tzinfo (~> 2.0)
       tzinfo-data (~> 1.0)
       yajl-ruby (~> 1.0)
     http_parser.rb (0.6.0)
@@ -34,10 +35,9 @@ GEM
     test-unit-rr (1.0.5)
       rr (>= 1.1.1)
       test-unit (>= 2.5.2)
-    thread_safe (0.3.6)
-    tzinfo (1.2.5)
-      thread_safe (~> 0.1)
-    tzinfo-data (1.2019.2)
+    tzinfo (2.0.0)
+      concurrent-ruby (~> 1.0)
+    tzinfo-data (1.2019.3)
       tzinfo (>= 1.0.0)
     yajl-ruby (1.4.1)
 
