@@ -6,17 +6,16 @@ require "fluent/test/driver/filter"
 require "fluent/test/helpers"
 require "./lib/fluent/plugin/filter_masking.rb"
 
-
 MASK_STRING = "*******"
 
-class YourOwnFilterTest < Test::Unit::TestCase
+class MaskingFilterTest < Test::Unit::TestCase
   def setup
     Fluent::Test.setup # this is required to setup router and others
   end
 
   # default configuration for tests
   CONFIG = %[
-    fieldsToMaskFilePath test/fields-to-mask
+    fieldsToMaskFilePath test/plugin/fields-to-mask
   ]
 
   def create_driver(conf = CONFIG)

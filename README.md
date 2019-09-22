@@ -1,6 +1,6 @@
 # fluent-plugin-masking
 
-[![Known Vulnerabilities](https://snyk.io//test/github/PayU/fluent-plugin-masking/badge.svg?targetFile=Gemfile.lock)](https://snyk.io//test/github/PayU/fluent-plugin-masking?targetFile=Gemfile.lock) [![Build Status](https://travis-ci.com/PayU/fluent-plugin-masking.svg?branch=master)](https://travis-ci.com/PayU/fluent-plugin-masking)
+[![Known Vulnerabilities](https://snyk.io//test/github/PayU/fluent-plugin-masking/badge.svg?targetFile=Gemfile.lock)](https://snyk.io//test/github/PayU/fluent-plugin-masking?targetFile=Gemfile.lock) [![Build Status](https://travis-ci.com/PayU/fluent-plugin-masking.svg?branch=master)](https://travis-ci.com/PayU/fluent-plugin-masking) [![Gem Version](https://badge.fury.io/rb/fluent-plugin-masking.svg)](https://badge.fury.io/rb/fluent-plugin-masking)
 
 ## Overview
 Fluentd filter plugin to mask sensitive or privacy records with `*******` in place of the original value. This data masking plugin protects data such as name, email, phonenumber, address, and any other field you would like to mask.

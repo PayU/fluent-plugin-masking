@@ -6,4 +6,4 @@ require 'rake/testtask'
   test.verbose = true
 end
 
-task :default => :test
+task :default => [:test, 'coveralls:push']
