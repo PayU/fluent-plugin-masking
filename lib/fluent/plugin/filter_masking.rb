@@ -17,14 +17,15 @@ module Fluent
         maskedRecord = record
         excludedFields = []
         @fieldsToExcludeJSONPathsArray.each do | field |
-          if record.dig(*field.split(".")) != nil
-            excludedFields = excludedFields + record.dig(*field.split(".")).split(',')
+          field_value = record.dig(*field)
+          if  field_value != nil
+            excludedFields = excludedFields + field_value.split(',')
           end
         end
         begin 
           recordStr = record.to_s
           @fields_to_mask_regex.each do | fieldToMaskRegex, fieldToMaskRegexStringReplacement |
-            if (excludedFields.length == 0 || !(excludedFields.include? @fields_to_mask_keys[fieldToMaskRegex]))
+            if !(excludedFields.include? @fields_to_mask_keys[fieldToMaskRegex])
               recordStr = recordStr.gsub(fieldToMaskRegex, fieldToMaskRegexStringReplacement) 
             end
           end
@@ -53,7 +54,10 @@ module Fluent
         fieldsToExcludeJSONPaths = conf['fieldsToExcludeJSONPaths']
 
         if fieldsToExcludeJSONPaths != nil && fieldsToExcludeJSONPaths.size() > 0 
-          @fieldsToExcludeJSONPathsArray = fieldsToExcludeJSONPaths.split(",")
+          fieldsToExcludeJSONPaths.split(",").each do | field |
+            # To save splits we'll save the path as an array
+            @fieldsToExcludeJSONPathsArray.push(field.split("."))
+          end
         end
 
         File.open(fieldsToMaskFilePath, "r") do |f|
