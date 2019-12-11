@@ -19,15 +19,15 @@ Install with gem:
 ## Setup
 In order to setup this plugin, the parameter `fieldsToMaskFilePath` needs to be a valid path to a file containing a list of all the fields to mask. The file should have a unique field on each line. These fields **are** case-sensitive (`Name` != `name`).
 
-In addition, there's a new optional parameter called `fieldsToExcludeJSONPaths` it contains a comma separated list for JSON fields which include optional excluded fields (with dot notation for nesting).  
+In addition, there's an optional parameter called `fieldsToExcludeJSONPaths` which receives as input a comma separated string of JSON fields that should be excluded in the masking procedure. Nested JSON fields are supported by `dot notation` (i.e: `path.to.excluded.field.in.record.nestedExcludedField`)
 The JSON fields are comma separated as well.  
-This can be used for things like registration services or audit log entries which do not need to be masked.  
+This can be used for logs of registration services or audit log entries which do not need to be masked.  
 This is configured as shown below:
 ```
 <filter "**">
   @type masking
   fieldsToMaskFilePath "/path/to/fields-to-mask-file"
-  fieldsToExcludeJSONPaths "excludeMaskFields,exclude.excludeMaskFields"
+  fieldsToExcludeJSONPaths "excludedField,exclude.path.nestedExcludedField"
 </filter>
 ```
 
@@ -56,7 +56,7 @@ phone
 <filter "**">
   @type masking
   fieldsToMaskFilePath "/path/to/fields-to-mask-file"
-  fieldsToExcludeJSONPaths "excludeMaskFields,exclude.excludeMaskFields"
+  fieldsToExcludeJSONPaths "excludedField,exclude.path.nestedExcludedField"
 </filter>
 
 <match "**">
