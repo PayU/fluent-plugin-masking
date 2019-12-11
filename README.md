@@ -20,7 +20,7 @@ Install with gem:
 In order to setup this plugin, the parameter `fieldsToMaskFilePath` needs to be a valid path to a file containing a list of all the fields to mask. The file should have a unique field on each line. These fields **are** case-sensitive (`Name` != `name`).
 
 In addition, there's an optional parameter called `fieldsToExcludeJSONPaths` which receives as input a comma separated string of JSON fields that should be excluded in the masking procedure. Nested JSON fields are supported by `dot notation` (i.e: `path.to.excluded.field.in.record.nestedExcludedField`)
-The JSON fields are comma separated as well.  
+The JSON fields that are excluded are comma separated.  
 This can be used for logs of registration services or audit log entries which do not need to be masked.  
 This is configured as shown below:
 ```
@@ -91,9 +91,9 @@ This sample result is created from the above configuration file `fluent.conf`. A
 
 A sample with exclude in use:
 fluentd -c fluent.conf
-echo '{ :body => "{\"first_name\":\"mickey\", \"type\":\"puggle\", \"last_name\":\"the-dog\", \"password\":\"d0g43u39\"}", "excludeMaskFields"=>"first_name"}' > /tmp/test.log
+echo '{ :body => "{\"first_name\":\"mickey\", \"type\":\"puggle\", \"last_name\":\"the-dog\", \"password\":\"d0g43u39\"}", "excludeMaskFields"=>"first_name,last_name"}' > /tmp/test.log
 ```
 
 ```
-2019-12-01 14:25:53.385681000 +0300 maskme: {"message":"{ :body => \"{\\\"first_name\\\":\\\"mickey\\\", \\\"type\\\":\\\"puggle\\\", \\\"last_name\\\":\\\"*******\\\", \\\"password\\\":\\\"*******\\\"}\"}"}
+2019-12-01 14:25:53.385681000 +0300 maskme: {"message":"{ :body => \"{\\\"first_name\\\":\\\"mickey\\\", \\\"type\\\":\\\"puggle\\\", \\\"last_name\\\":\\\"the-dog\\\", \\\"password\\\":\\\"*******\\\"}\"}"}
 ```
