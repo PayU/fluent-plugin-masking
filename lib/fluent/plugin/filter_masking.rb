@@ -56,7 +56,12 @@ module Fluent
         if fieldsToExcludeJSONPaths != nil && fieldsToExcludeJSONPaths.size() > 0 
           fieldsToExcludeJSONPaths.split(",").each do | field |
             # To save splits we'll save the path as an array
-            @fieldsToExcludeJSONPathsArray.push(field.split("."))
+            splitArray = field.split(".")
+            symArray = []
+            splitArray.each do | pathPortion |
+              symArray.push(pathPortion.to_sym)
+            end
+            @fieldsToExcludeJSONPathsArray.push(symArray)
           end
         end
 
