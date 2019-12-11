@@ -90,6 +90,7 @@ This sample result is created from the above configuration file `fluent.conf`. A
 ```
 
 A sample with exclude in use:
+```
 fluentd -c fluent.conf
 echo '{ :body => "{\"first_name\":\"mickey\", \"type\":\"puggle\", \"last_name\":\"the-dog\", \"password\":\"d0g43u39\"}", "excludeMaskFields"=>"first_name,last_name"}' > /tmp/test.log
 ```
