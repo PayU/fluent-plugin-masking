@@ -19,11 +19,15 @@ Install with gem:
 ## Setup
 In order to setup this plugin, the parameter `fieldsToMaskFilePath` needs to be a valid path to a file containing a list of all the fields to mask. The file should have a unique field on each line. These fields **are** case-sensitive (`Name` != `name`).
 
+In addition, there's a new optional parameter called `fieldsToExcludeJSONPaths` it contains a comma separated list for JSON fields which include optional excluded fields (with dot notation for nesting).  
+The JSON fields are comma separated as well.  
+This can be used for things like registration services or audit log entries which do not need to be masked.  
 This is configured as shown below:
 ```
 <filter "**">
   @type masking
   fieldsToMaskFilePath "/path/to/fields-to-mask-file"
+  fieldsToExcludeJSONPaths "excludeMaskFields,exclude.excludeMaskFields"
 </filter>
 ```
 
@@ -52,6 +56,7 @@ phone
 <filter "**">
   @type masking
   fieldsToMaskFilePath "/path/to/fields-to-mask-file"
+  fieldsToExcludeJSONPaths "excludeMaskFields,exclude.excludeMaskFields"
 </filter>
 
 <match "**">
@@ -82,4 +87,13 @@ This sample result is created from the above configuration file `fluent.conf`. A
 
 ```
 2019-09-15 16:12:50.359191000 +0300 maskme: {"message":"{ :body => \"{\\\"first_name\\\":\\\"*******\\\", \\\"type\\\":\\\"puggle\\\", \\\"last_name\\\":\\\"*******\\\", \\\"password\\\":\\\"*******\\\"}\"}"}
+```
+
+A sample with exclude in use:
+fluentd -c fluent.conf
+echo '{ :body => "{\"first_name\":\"mickey\", \"type\":\"puggle\", \"last_name\":\"the-dog\", \"password\":\"d0g43u39\"}", "excludeMaskFields"=>"first_name"}' > /tmp/test.log
+```
+
+```
+2019-12-01 14:25:53.385681000 +0300 maskme: {"message":"{ :body => \"{\\\"first_name\\\":\\\"mickey\\\", \\\"type\\\":\\\"puggle\\\", \\\"last_name\\\":\\\"*******\\\", \\\"password\\\":\\\"*******\\\"}\"}"}
 ```
