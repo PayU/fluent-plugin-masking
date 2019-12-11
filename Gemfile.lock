@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fluent-plugin-masking (1.0.8)
+    fluent-plugin-masking (1.1.0)
       fluentd (>= 0.14.0)
 
 GEM
@@ -10,7 +10,7 @@ GEM
     concurrent-ruby (1.1.5)
     cool.io (1.5.4)
     dig_rb (1.0.1)
-    fluentd (1.7.2)
+    fluentd (1.7.4)
       cool.io (>= 1.4.5, < 2.0.0)
       dig_rb (~> 1.0.0)
       http_parser.rb (>= 0.5.1, < 0.7.0)
@@ -26,7 +26,7 @@ GEM
     power_assert (1.1.5)
     rake (12.3.3)
     rr (1.2.1)
-    serverengine (2.1.1)
+    serverengine (2.2.0)
       sigdump (~> 0.2.2)
     sigdump (0.2.4)
     strptime (0.2.3)

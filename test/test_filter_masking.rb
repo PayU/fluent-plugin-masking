@@ -17,6 +17,12 @@ class YourOwnFilterTest < Test::Unit::TestCase
   # default configuration for tests
   CONFIG = %[
     fieldsToMaskFilePath test/fields-to-mask
+    fieldsToExcludeJSONPaths excludedField,exclude.path.nestedExcludedField
+  ]
+
+  # configuration for tests without exclude parameter
+  CONFIG_NO_EXCLUDE = %[
+    fieldsToMaskFilePath test/fields-to-mask
   ]
 
   def create_driver(conf = CONFIG)
@@ -35,7 +41,7 @@ class YourOwnFilterTest < Test::Unit::TestCase
 
   sub_test_case 'plugin will mask all fields that need masking' do
     test 'mask field in hash object' do
-      conf = CONFIG
+      conf = CONFIG_NO_EXCLUDE
       messages = [
         {:not_masked_field=>"mickey-the-dog", :email=>"mickey-the-dog@zooz.com"}
       ]
@@ -89,6 +95,39 @@ class YourOwnFilterTest < Test::Unit::TestCase
       ]
       expected = [
         { :body => "{\"first_name\":\"*******\",\"last_name\":\"*******\",\"address\":\"{\\\"street\\\":\\\"*******\\\",\\\"number\\\":\\\"*******\\\"}\", \"type\":\"puggle\"}" }
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+    test 'mask field in hash object with exclude' do
+      conf = CONFIG
+      messages = [
+        {:not_masked_field=>"mickey-the-dog", :email=>"mickey-the-dog@zooz.com", :first_name=>"Micky", :excludedField=>"first_name"}
+      ]
+      expected = [
+        {:not_masked_field=>"mickey-the-dog", :email=>MASK_STRING, :first_name=>"Micky", :excludedField=>"first_name"}
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+    test 'mask field in hash object with nested exclude' do
+      conf = CONFIG
+      messages = [
+        {:not_masked_field=>"mickey-the-dog", :last_name=>"the dog", :email=>"mickey-the-dog@zooz.com", :first_name=>"Micky",  :exclude=>{:path=>{:nestedExcludedField=>"first_name,last_name"}}}
+      ]
+      expected = [
+        {:not_masked_field=>"mickey-the-dog", :last_name=>"the dog", :email=>MASK_STRING, :first_name=>"Micky", :exclude=>{:path=>{:nestedExcludedField=>"first_name,last_name"}}}
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+    test 'mask field in hash object with base and nested exclude' do
+      conf = CONFIG
+      messages = [
+        {:not_masked_field=>"mickey-the-dog", :last_name=>"the dog", :email=>"mickey-the-dog@zooz.com", :first_name=>"Micky", :excludedField=>"first_name", :exclude=>{:path=>{:nestedExcludedField=>"last_name"}}}
+      ]
+      expected = [
+        {:not_masked_field=>"mickey-the-dog", :last_name=>"the dog", :email=>MASK_STRING, :first_name=>"Micky", :excludedField=>"first_name", :exclude=>{:path=>{:nestedExcludedField=>"last_name"}}}
       ]
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)

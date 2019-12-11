@@ -15,11 +15,19 @@ module Fluent
       # error safe method - if any error occurs the original record is returned
       def maskRecord(record)
         maskedRecord = record
-        
-        begin
+        excludedFields = []
+        @fieldsToExcludeJSONPathsArray.each do | field |
+          field_value = record.dig(*field)
+          if  field_value != nil
+            excludedFields = excludedFields + field_value.split(',')
+          end
+        end
+        begin 
           recordStr = record.to_s
           @fields_to_mask_regex.each do | fieldToMaskRegex, fieldToMaskRegexStringReplacement |
-            recordStr = recordStr.gsub(fieldToMaskRegex, fieldToMaskRegexStringReplacement) 
+            if !(excludedFields.include? @fields_to_mask_keys[fieldToMaskRegex])
+              recordStr = recordStr.gsub(fieldToMaskRegex, fieldToMaskRegexStringReplacement) 
+            end
           end
 
           maskedRecord = strToHash(recordStr)
@@ -35,12 +43,27 @@ module Fluent
         super
         @fields_to_mask = []
         @fields_to_mask_regex = {}
+        @fields_to_mask_keys = {}
+        @fieldsToExcludeJSONPathsArray = []
       end
 
       # this method only called ones (on startup time)
       def configure(conf)
         super
         fieldsToMaskFilePath = conf['fieldsToMaskFilePath']
+        fieldsToExcludeJSONPaths = conf['fieldsToExcludeJSONPaths']
+
+        if fieldsToExcludeJSONPaths != nil && fieldsToExcludeJSONPaths.size() > 0 
+          fieldsToExcludeJSONPaths.split(",").each do | field |
+            # To save splits we'll save the path as an array
+            splitArray = field.split(".")
+            symArray = []
+            splitArray.each do | pathPortion |
+              symArray.push(pathPortion.to_sym)
+            end
+            @fieldsToExcludeJSONPathsArray.push(symArray)
+          end
+        end
 
         File.open(fieldsToMaskFilePath, "r") do |f|
           f.each_line do |line|
@@ -54,10 +77,12 @@ module Fluent
             hashObjectRegex = Regexp.new(/(?::#{value}=>")(.*?)(?:")/m) # mask element in hash object
             hashObjectRegexStringReplacement = ":#{value}=>\"#{MASK_STRING}\""
             @fields_to_mask_regex[hashObjectRegex] = hashObjectRegexStringReplacement
+            @fields_to_mask_keys[hashObjectRegex] = value
 
             innerJSONStringRegex = Regexp.new(/(\\+)"#{value}\\+":\\+.+?((?=(})|,( *|)(\s|\\+)\")|(?=}"$))/m) # mask element in json string using capture groups that count the level of escaping inside the json string
             innerJSONStringRegexStringReplacement = "\\1\"#{value}\\1\":\\1\"#{MASK_STRING}\\1\""
             @fields_to_mask_regex[innerJSONStringRegex] = innerJSONStringRegexStringReplacement
+            @fields_to_mask_keys[innerJSONStringRegex] = value
           end
         end
 
