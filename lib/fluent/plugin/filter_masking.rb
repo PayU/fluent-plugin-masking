@@ -11,18 +11,37 @@ module Fluent
         eval(str)
       end
 
+      def myDig(input, path)
+        curr = input
+        for segment in path do
+          if curr != nil && curr.respond_to?(:dig)
+            if curr[segment] == nil
+              curr = curr[segment.to_s]
+            else
+              curr = curr[segment]
+            end
+          else
+            return nil
+          end
+        end
+        curr
+      end
       # returns the masked record
       # error safe method - if any error occurs the original record is returned
       def maskRecord(record)
         maskedRecord = record
         excludedFields = []
-        @fieldsToExcludeJSONPathsArray.each do | field |
-          field_value = record.dig(*field)
-          if  field_value != nil
-            excludedFields = excludedFields + field_value.split(',')
+        begin
+          @fieldsToExcludeJSONPathsArray.each do | field |
+            field_value = myDig(record, field)
+            if  field_value != nil
+              excludedFields = excludedFields + field_value.split(',')
+            end
           end
+        rescue Exception => e
+          $log.error "Failed to find mask record: #{e}"
         end
-        begin 
+        begin
           recordStr = record.to_s
           @fields_to_mask_regex.each do | fieldToMaskRegex, fieldToMaskRegexStringReplacement |
             if !(excludedFields.include? @fields_to_mask_keys[fieldToMaskRegex])
