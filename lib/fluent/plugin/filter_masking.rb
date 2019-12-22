@@ -1,5 +1,5 @@
 require 'fluent/filter'
-require './lib/fluent/plugin/helpers.rb'
+require_relative './helpers.rb'
 
 module Fluent
   module Plugin
