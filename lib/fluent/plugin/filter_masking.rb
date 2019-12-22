@@ -1,8 +1,10 @@
 require 'fluent/filter'
+require './lib/fluent/plugin/helpers.rb'
 
 module Fluent
   module Plugin
     class MaskingFilter < Filter
+      include Helpers
       Fluent::Plugin.register_filter("masking", self) # for "@type masking" in configuration
 
       MASK_STRING = "*******"
@@ -16,13 +18,17 @@ module Fluent
       def maskRecord(record)
         maskedRecord = record
         excludedFields = []
-        @fieldsToExcludeJSONPathsArray.each do | field |
-          field_value = record.dig(*field)
-          if  field_value != nil
-            excludedFields = excludedFields + field_value.split(',')
+        begin
+          @fieldsToExcludeJSONPathsArray.each do | field |
+            field_value = myDig(record, field)
+            if field_value != nil
+              excludedFields = excludedFields + field_value.split(',')
+            end
           end
+        rescue Exception => e
+          $log.error "Failed to find mask exclude record: #{e}"
         end
-        begin 
+        begin
           recordStr = record.to_s
           @fields_to_mask_regex.each do | fieldToMaskRegex, fieldToMaskRegexStringReplacement |
             if !(excludedFields.include? @fields_to_mask_keys[fieldToMaskRegex])

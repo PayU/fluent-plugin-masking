@@ -132,5 +132,16 @@ class YourOwnFilterTest < Test::Unit::TestCase
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
     end
+    test 'mask field in json string with exclude' do
+      conf = CONFIG
+      messages = [
+        { :body => "{\"first_name\":\"mickey\",\"last_name\":\"the-dog\", \"type\":\"puggle\"}", :excludedField=>"first_name" }
+      ]
+      expected = [
+        { :body => "{\"first_name\":\"mickey\",\"last_name\":\"*******\", \"type\":\"puggle\"}", :excludedField=>"first_name" }
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
   end
 end
