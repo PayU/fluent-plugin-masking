@@ -30,10 +30,6 @@ module Fluent
         end
         begin
           recordStr = record.to_s
-          if @useCaseInsensitiveFields == "true"
-            recordStr = recordStr.downcase
-          end
-
           @fields_to_mask_regex.each do | fieldToMaskRegex, fieldToMaskRegexStringReplacement |
             if !(excludedFields.include? @fields_to_mask_keys[fieldToMaskRegex])
               recordStr = recordStr.gsub(fieldToMaskRegex, fieldToMaskRegexStringReplacement) 
@@ -55,7 +51,6 @@ module Fluent
         @fields_to_mask_regex = {}
         @fields_to_mask_keys = {}
         @fieldsToExcludeJSONPathsArray = []
-        @useCaseInsensitiveFields = "false"
       end
 
       # this method only called ones (on startup time)
@@ -63,10 +58,6 @@ module Fluent
         super
         fieldsToMaskFilePath = conf['fieldsToMaskFilePath']
         fieldsToExcludeJSONPaths = conf['fieldsToExcludeJSONPaths']
-
-        if conf["useCaseInsensitiveFields"] != nil && conf["useCaseInsensitiveFields"] == "true"
-          @useCaseInsensitiveFields = "true"
-        end
 
         if fieldsToExcludeJSONPaths != nil && fieldsToExcludeJSONPaths.size() > 0 
           fieldsToExcludeJSONPaths.split(",").each do | field |
@@ -82,23 +73,27 @@ module Fluent
 
         File.open(fieldsToMaskFilePath, "r") do |f|
           f.each_line do |line|
-
             value = line.to_s # make sure it's string
             value = value.gsub(/\s+/, "") # remove spaces
             value = value.gsub('\n', '') # remove line breakers
 
-            if @useCaseInsensitiveFields == "true"
-              value = value.downcase
+            if value.end_with? "/i"
+              # case insensitive
+              value = value.delete_suffix('/i')
+              hashObjectRegex = Regexp.new(/(?::#{value}=>")(.*?)(?:")/mi)
+              innerJSONStringRegex = Regexp.new(/(\\+)"#{value}\\+"\s*:\s*(\\+|\{).+?((?=(})|,( *|)(\s|\\+)\"(}*))|(?=}"$)|("}(?!\"|\\)))/mi)
+            else
+              # case sensitive
+              hashObjectRegex = Regexp.new(/(?::#{value}=>")(.*?)(?:")/m)
+              innerJSONStringRegex = Regexp.new(/(\\+)"#{value}\\+"\s*:\s*(\\+|\{).+?((?=(})|,( *|)(\s|\\+)\"(}*))|(?=}"$)|("}(?!\"|\\)))/m)
             end
 
             @fields_to_mask.push(value)
 
-            hashObjectRegex = Regexp.new(/(?::#{value}=>")(.*?)(?:")/m) # mask element in hash object
             hashObjectRegexStringReplacement = ":#{value}=>\"#{MASK_STRING}\""
             @fields_to_mask_regex[hashObjectRegex] = hashObjectRegexStringReplacement
             @fields_to_mask_keys[hashObjectRegex] = value
 
-            innerJSONStringRegex = Regexp.new(/(\\+)"#{value}\\+"\s*:\s*(\\+|\{).+?((?=(})|,( *|)(\s|\\+)\"(}*))|(?=}"$)|("}(?!\"|\\)))/m) # mask element in json string using capture groups that count the level of escaping inside the json string
             innerJSONStringRegexStringReplacement = "\\1\"#{value}\\1\":\\1\"#{MASK_STRING}\\1\""
             @fields_to_mask_regex[innerJSONStringRegex] = innerJSONStringRegexStringReplacement
             @fields_to_mask_keys[innerJSONStringRegex] = value
