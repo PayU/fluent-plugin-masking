@@ -121,6 +121,7 @@ class YourOwnFilterTest < Test::Unit::TestCase
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
     end
+
     test 'mask field in hash object with base and nested exclude' do
       conf = CONFIG
       messages = [
@@ -132,6 +133,7 @@ class YourOwnFilterTest < Test::Unit::TestCase
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
     end
+
     test 'mask field in json string with exclude' do
       conf = CONFIG
       messages = [
@@ -143,5 +145,38 @@ class YourOwnFilterTest < Test::Unit::TestCase
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
     end
+
+    test 'mask field which is ineer json string field (should mask the whole object)' do
+      conf = CONFIG
+      messages = [
+        {
+          :body => { 
+            :action_name => "some_action", 
+            :action_type => "some type",
+            :request => {
+              :body_str => "{\"str_field\":\"mickey\",\"json_str_field\": {\"id\":\"ed8a8378-3235-4923-b802-7700167d1870\"},\"not_mask\":\"some_value\"}"
+            }
+          },
+          :timestamp => "2020-06-08T16:00:57.341Z"
+        }
+      ]
+
+      expected = [
+        {
+          :body => { 
+            :action_name => "some_action", 
+            :action_type => "some type",
+            :request => {
+              :body_str => "{\"str_field\":\"mickey\",\"json_str_field\":\"*******\",\"not_mask\":\"some_value\"}"
+            }
+          },
+          :timestamp => "2020-06-08T16:00:57.341Z"
+        }
+      ]
+
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+
   end
 end
