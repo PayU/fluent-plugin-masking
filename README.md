@@ -35,7 +35,7 @@ Example fields-to-mask-file:
 ```
 name
 email
-phone/i # the '/i' suffix will make sure phone field will be case insensitive ()
+phone/i # the '/i' suffix will make sure phone field will be case insensitive
 ```
 
 
