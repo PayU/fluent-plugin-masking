@@ -151,7 +151,7 @@ class YourOwnFilterTest < Test::Unit::TestCase
       assert_equal(expected, filtered_records)
     end
 
-    test 'mask field which is ineer json string field (should mask the whole object)' do
+    test 'mask field which is inner json string field (should mask the whole object)' do
       conf = CONFIG
       messages = [
         {
