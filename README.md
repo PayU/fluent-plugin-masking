@@ -38,7 +38,6 @@ email
 phone/i # the '/i' suffix will make sure phone field will be case insensitive
 ```
 
-
 ## Quick Guide
 
 ### Configuration:
