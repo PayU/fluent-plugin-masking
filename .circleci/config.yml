@@ -1,0 +1,33 @@
+version: 2.1
+orbs:
+  ruby: circleci/ruby@0.1.2 
+  
+executors:
+  v2-6-3:
+    docker:
+      - image: circleci/ruby:2.6.3-stretch-node
+  v2-5-0:
+    docker:
+      - image: circleci/ruby:2.5.0-stretch-node
+  v2-3-8:
+    docker:
+      - image: circleci/ruby:2.3.8-stretch-node
+
+jobs:
+  tests:
+    parameters:
+      ruby-version:
+        type: executor
+    executor: << parameters.ruby-version >>
+    steps:
+      - checkout
+      - run: gem update bundler
+
+workflows:
+  tests:
+    jobs:
+      - tests:
+          matrix:
+            parameters:
+              ruby-version: [v2-6-3, v2-5-0, v2-3-8]
+
