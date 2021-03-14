@@ -24,6 +24,7 @@ jobs:
       - run: gem update bundler
       - run: ruby --version
       - run: ls -l
+      - run: ruby ./test/test_helpers.rb
 
 workflows:
   tests:
