@@ -3,3 +3,4 @@ vendor/
 *.gem
 .idea/
 Gemfile.lock
+Rakefile
