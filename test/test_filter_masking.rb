@@ -1,5 +1,3 @@
-# test/plugin/test_filter_your_own.rb
-
 require "test-unit"
 require "fluent/test"
 require "fluent/test/driver/filter"
