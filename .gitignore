@@ -2,3 +2,4 @@
 vendor/
 *.gem
 .idea/
+Gemfile.lock
