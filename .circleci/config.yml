@@ -23,6 +23,7 @@ jobs:
       - checkout
       - run: gem install bundler
       - run: bundle install
+      - run: bundle update
       - run: ruby -r ./test/*.rb
 
 workflows:
