@@ -22,6 +22,7 @@ jobs:
     steps:
       - checkout
       - run: gem update bundler
+      - run: ruby --version
       - run: ls -l
 
 workflows:
