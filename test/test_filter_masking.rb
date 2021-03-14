@@ -1,5 +1,3 @@
-# test/plugin/test_filter_your_own.rb
-
 require "test-unit"
 require "fluent/test"
 require "fluent/test/driver/filter"
@@ -25,6 +23,11 @@ class YourOwnFilterTest < Test::Unit::TestCase
     fieldsToMaskFilePath test/fields-to-mask
   ]
 
+  # configuration for tests with case insensitive fields
+  CONFIG_CASE_INSENSITIVE = %[
+    fieldsToMaskFilePath test/fields-to-mask-insensitive
+  ]
+
   def create_driver(conf = CONFIG)
     Fluent::Test::Driver::Filter.new(Fluent::Plugin::MaskingFilter).configure(conf)
   end
@@ -39,7 +42,7 @@ class YourOwnFilterTest < Test::Unit::TestCase
     d.filtered_records
   end
 
-  sub_test_case 'plugin will mask all fields that need masking' do
+  sub_test_case 'plugin will mask all fields that need masking - case sensitive fields' do
     test 'mask field in hash object' do
       conf = CONFIG_NO_EXCLUDE
       messages = [
@@ -121,6 +124,7 @@ class YourOwnFilterTest < Test::Unit::TestCase
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
     end
+
     test 'mask field in hash object with base and nested exclude' do
       conf = CONFIG
       messages = [
@@ -132,6 +136,7 @@ class YourOwnFilterTest < Test::Unit::TestCase
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
     end
+
     test 'mask field in json string with exclude' do
       conf = CONFIG
       messages = [
@@ -143,5 +148,90 @@ class YourOwnFilterTest < Test::Unit::TestCase
       filtered_records = filter(conf, messages)
       assert_equal(expected, filtered_records)
     end
+
+    test 'mask field which is inner json string field (should mask the whole object)' do
+      conf = CONFIG
+      messages = [
+        {
+          :body => { 
+            :action_name => "some_action", 
+            :action_type => "some type",
+            :request => {
+              :body_str => "{\"str_field\":\"mickey\",\"json_str_field\": {\"id\":\"ed8a8378-3235-4923-b802-7700167d1870\"},\"not_mask\":\"some_value\"}"
+            }
+          },
+          :timestamp => "2020-06-08T16:00:57.341Z"
+        }
+      ]
+
+      expected = [
+        {
+          :body => { 
+            :action_name => "some_action", 
+            :action_type => "some type",
+            :request => {
+              :body_str => "{\"str_field\":\"mickey\",\"json_str_field\":\"*******\",\"not_mask\":\"some_value\"}"
+            }
+          },
+          :timestamp => "2020-06-08T16:00:57.341Z"
+        }
+      ]
+
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
   end
+
+  sub_test_case 'plugin will mask all fields that need masking - case INSENSITIVE fields' do
+
+    test 'mask field in hash object with camel case' do
+      conf = CONFIG_CASE_INSENSITIVE
+      messages = [
+        {:not_masked_field=>"mickey-the-dog", :Email=>"mickey-the-dog@zooz.com"}
+      ]
+      expected = [
+        {:not_masked_field=>"mickey-the-dog", :email=>MASK_STRING}
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+
+    test 'not mask field in hash object since case not match' do
+      conf = CONFIG_CASE_INSENSITIVE
+      messages = [
+        {:not_masked_field=>"mickey-the-dog", :FIRST_NAME=>"mickey-the-dog@zooz.com"}
+      ]
+      expected = [
+        {:not_masked_field=>"mickey-the-dog", :FIRST_NAME=>"mickey-the-dog@zooz.com"}
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+
+    test 'mask field in hash object with snakecase' do
+      conf = CONFIG_CASE_INSENSITIVE
+      messages = [
+        {:not_masked_field=>"mickey-the-dog", :LaSt_NaMe=>"mickey-the-dog@zooz.com"}
+      ]
+      expected = [
+        {:not_masked_field=>"mickey-the-dog", :last_name=>MASK_STRING}
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+
+    test 'mask case insensitive and case sensitive field in nested json escaped string' do
+      conf = CONFIG_CASE_INSENSITIVE
+      messages = [
+        { :body => "{\"firsT_naMe\":\"mickey\",\"last_name\":\"the-dog\",\"address\":\"{\\\"Street\":\\\"Austin\\\",\\\"number\":\\\"89\\\"}\", \"type\":\"puggle\"}" } 
+      ]
+      expected = [
+        { :body => "{\"firsT_naMe\":\"mickey\",\"last_name\":\"*******\",\"address\":\"{\\\"street\\\":\\\"*******\\\",\\\"number\\\":\\\"*******\\\"}\", \"type\":\"puggle\"}" }
+      ]
+      filtered_records = filter(conf, messages)
+      assert_equal(expected, filtered_records)
+    end
+
+  end
+
 end

@@ -4,3 +4,4 @@ last_name
 street
 number
 password
+json_str_field

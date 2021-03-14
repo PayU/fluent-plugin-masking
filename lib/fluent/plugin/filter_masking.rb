@@ -73,19 +73,27 @@ module Fluent
 
         File.open(fieldsToMaskFilePath, "r") do |f|
           f.each_line do |line|
-
             value = line.to_s # make sure it's string
             value = value.gsub(/\s+/, "") # remove spaces
             value = value.gsub('\n', '') # remove line breakers
 
+            if value.end_with? "/i"
+              # case insensitive
+              value = value.delete_suffix('/i')
+              hashObjectRegex = Regexp.new(/(?::#{value}=>")(.*?)(?:")/mi)
+              innerJSONStringRegex = Regexp.new(/(\\+)"#{value}\\+"\s*:\s*(\\+|\{).+?((?=(})|,( *|)(\s|\\+)\"(}*))|(?=}"$)|("}(?!\"|\\)))/mi)
+            else
+              # case sensitive
+              hashObjectRegex = Regexp.new(/(?::#{value}=>")(.*?)(?:")/m)
+              innerJSONStringRegex = Regexp.new(/(\\+)"#{value}\\+"\s*:\s*(\\+|\{).+?((?=(})|,( *|)(\s|\\+)\"(}*))|(?=}"$)|("}(?!\"|\\)))/m)
+            end
+
             @fields_to_mask.push(value)
 
-            hashObjectRegex = Regexp.new(/(?::#{value}=>")(.*?)(?:")/m) # mask element in hash object
             hashObjectRegexStringReplacement = ":#{value}=>\"#{MASK_STRING}\""
             @fields_to_mask_regex[hashObjectRegex] = hashObjectRegexStringReplacement
             @fields_to_mask_keys[hashObjectRegex] = value
 
-            innerJSONStringRegex = Regexp.new(/(\\+)"#{value}\\+":\\+.+?((?=(})|,( *|)(\s|\\+)\")|(?=}"$))/m) # mask element in json string using capture groups that count the level of escaping inside the json string
             innerJSONStringRegexStringReplacement = "\\1\"#{value}\\1\":\\1\"#{MASK_STRING}\\1\""
             @fields_to_mask_regex[innerJSONStringRegex] = innerJSONStringRegexStringReplacement
             @fields_to_mask_keys[innerJSONStringRegex] = value

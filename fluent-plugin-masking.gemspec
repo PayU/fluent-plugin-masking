@@ -18,11 +18,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.license = "Apache-2.0"
 
-  spec.required_ruby_version = '>= 2.1'
+  spec.required_ruby_version = '>= 2.5.0'
   
   spec.add_runtime_dependency "fluentd", ">= 0.14.0"
-  spec.add_development_dependency "bundler", "1.17.3"
-  spec.add_development_dependency "rake", "~> 12.0"
   spec.add_development_dependency "test-unit", ">= 3.1.0"
   spec.add_development_dependency "test-unit-rr"
 end
