@@ -25,6 +25,7 @@ jobs:
       - run: ruby --version
       - run: ls -l
       - run: ruby ./test/test_helpers.rb
+      - run: ruby ./test/test_filter_masking.rb 
 
 workflows:
   tests:
