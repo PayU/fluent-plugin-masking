@@ -21,7 +21,7 @@ jobs:
     executor: << parameters.ruby-version >>
     steps:
       - checkout
-      - run: gem update bundler
+      - run: gem install bundler
       - run: bundle install 
       - run: ruby --version
       - run: ls -l
