@@ -22,11 +22,8 @@ jobs:
     steps:
       - checkout
       - run: gem install bundler
-      - run: bundle install 
-      - run: ruby --version
-      - run: ls -l
-      - run: ruby ./test/test_helpers.rb
-      - run: ruby ./test/test_filter_masking.rb 
+      - run: bundle install
+      - run: ruby -r ./test/*.rb
 
 workflows:
   tests:
