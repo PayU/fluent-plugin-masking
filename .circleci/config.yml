@@ -5,13 +5,13 @@ orbs:
 executors:
   v2-6-3:
     docker:
-      - image: circleci/ruby:2.6.3-stretch-node
+      - image: circleci/ruby:2.6.3
   v2-5-0:
     docker:
-      - image: circleci/ruby:2.5.0-stretch-node
+      - image: circleci/ruby:2.5.0
   v2-3-8:
     docker:
-      - image: circleci/ruby:2.3.8-stretch-node
+      - image: circleci/ruby:2.3.8
 
 jobs:
   tests:
@@ -23,7 +23,6 @@ jobs:
       - checkout
       - run: gem install bundler
       - run: bundle install
-      - run: bundle update
       - run: ruby -r ./test/*.rb
 
 workflows:
