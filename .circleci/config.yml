@@ -22,6 +22,7 @@ jobs:
     steps:
       - checkout
       - run: gem update bundler
+      - run: ruby ./test/test_filter_masking.rb
 
 workflows:
   tests:
