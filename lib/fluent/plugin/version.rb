@@ -1,3 +1,3 @@
 module FilterMasking
-    VERSION = "1.1.1"
-end 
+    VERSION = "1.2.0"
+end

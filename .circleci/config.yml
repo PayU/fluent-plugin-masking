@@ -1,0 +1,29 @@
+version: 2.1
+orbs:
+  ruby: circleci/ruby@0.1.2 
+  
+executors:
+  v2-5-0:
+    docker:
+      - image: circleci/ruby:2.5.0
+
+jobs:
+  tests:
+    parameters:
+      ruby-version:
+        type: executor
+    executor: << parameters.ruby-version >>
+    steps:
+      - checkout
+      - run: gem install bundler
+      - run: bundle install
+      - run: ruby -r ./test/*.rb
+
+workflows:
+  tests:
+    jobs:
+      - tests:
+          matrix:
+            parameters:
+              ruby-version: [v2-5-0]
+

@@ -1,5 +1,5 @@
 require 'fluent/filter'
-require './lib/fluent/plugin/helpers.rb'
+require_relative './helpers.rb'
 
 module Fluent
   module Plugin
@@ -85,7 +85,6 @@ module Fluent
 
         File.open(fieldsToMaskFilePath, "r") do |f|
           f.each_line do |line|
-
             value = line.to_s # make sure it's string
             value = value.gsub(/\s+/, "") # remove spaces
             value = value.gsub('\n', '') # remove line breakers

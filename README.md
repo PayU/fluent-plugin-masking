@@ -8,7 +8,7 @@ Fluentd filter plugin to mask sensitive or privacy records with `*******` in pla
 # Requirements
 | fluent-plugin-masking    | fluentd    | ruby   |
 | ---------------------    | ---------- | ------ |
-| 1.0.x                    | 	>= v0.14.0 | >= 2.1 |
+| 1.2.x                    | 	>= v0.14.0 | >= 2.5 |
 
 
 # Installation
@@ -39,7 +39,7 @@ Example fields-to-mask-file:
 ```
 name
 email
-phone
+phone/i # the '/i' suffix will make sure phone field will be case insensitive
 ```
 
 # Quick Guide
