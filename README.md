@@ -2,22 +2,22 @@
 
 [![Known Vulnerabilities](https://snyk.io//test/github/PayU/fluent-plugin-masking/badge.svg?targetFile=Gemfile.lock)](https://snyk.io//test/github/PayU/fluent-plugin-masking?targetFile=Gemfile.lock) [![Build Status](https://travis-ci.com/PayU/fluent-plugin-masking.svg?branch=master)](https://travis-ci.com/PayU/fluent-plugin-masking)
 
-# Overview
+## Overview
 Fluentd filter plugin to mask sensitive or privacy records with `*******` in place of the original value. This data masking plugin protects data such as name, email, phonenumber, address, and any other field you would like to mask.
 
-# Requirements
+## Requirements
 | fluent-plugin-masking    | fluentd    | ruby   |
 | ---------------------    | ---------- | ------ |
 | 1.2.x                    | 	>= v0.14.0 | >= 2.5 |
 
 
-# Installation
+## Installation
 Install with gem:
 
 `fluent-gem install fluent-plugin-masking`
 
-# Setup
-In order to setup this plugin, the parameter `fieldsToMaskFilePath` needs to be a valid path to a file containing a list of all the fields to mask. The file should have a unique field on each line. These fields **are** case-sensitive (`Name` != `name`).
+## Setup
+In order to setup this plugin, the parameter `fieldsToMaskFilePath` needs to be a valid path to a file containing a list of all the fields to mask. The file should have a unique field on each line. These fields **are** case-sensitive (`Name` != `name`). if you one or more of the fields will be case insensitive, use the `/i` suffix in your field. see example below.
 
 ### Optional configuration
  - `fieldsToExcludeJSONPaths` - this field receives as input a comma separated string of JSON fields that should be excluded in the masking procedure. Nested JSON fields are supported by `dot notation` (i.e: `path.to.excluded.field.in.record.nestedExcludedField`) The JSON fields that are excluded are comma separated.  
@@ -42,7 +42,7 @@ email
 phone/i # the '/i' suffix will make sure phone field will be case insensitive
 ```
 
-# Quick Guide
+## Quick Guide
 
 ### Configuration:
 ```
@@ -102,12 +102,12 @@ echo '{ :body => "{\"first_name\":\"mickey\", \"type\":\"puggle\", \"last_name\"
 2019-12-01 14:25:53.385681000 +0300 maskme: {"message":"{ :body => \"{\\\"first_name\\\":\\\"mickey\\\", \\\"type\\\":\\\"puggle\\\", \\\"last_name\\\":\\\"the-dog\\\", \\\"password\\\":\\\"*******\\\"}\"}"}
 ```
 
-# Run Unit Tests
+## Run Unit Tests
 ```
 gem install bundler
 bundle install
 ruby -r ./test/*.rb
 ```
 
-# Special escaped json cases handling
+## Special escaped json cases handling
 
