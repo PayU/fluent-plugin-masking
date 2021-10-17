@@ -17,7 +17,7 @@ Install with gem:
 `fluent-gem install fluent-plugin-masking`
 
 ## Setup
-In order to setup this plugin, the parameter `fieldsToMaskFilePath` needs to be a valid path to a file containing a list of all the fields to mask. The file should have a unique field on each line. These fields **are** case-sensitive (`Name` != `name`). if you one or more of the fields will be case insensitive, use the `/i` suffix in your field. see example below.
+In order to setup this plugin, the parameter `fieldsToMaskFilePath` needs to be a valid path to a file containing a list of all the fields to mask. The file should have a unique field on each line. These fields **are** case-sensitive (`Name` != `name`). in case you need one (or more) of the fields to be case insensitive, use the `/i` suffix in your field name. see example below.
 
 ### Optional configuration
  - `fieldsToExcludeJSONPaths` - this field receives as input a comma separated string of JSON fields that should be excluded in the masking procedure. Nested JSON fields are supported by `dot notation` (i.e: `path.to.excluded.field.in.record.nestedExcludedField`) The JSON fields that are excluded are comma separated.  
