@@ -60,7 +60,7 @@ module Fluent
 
         @handleSpecialEscapedJsonCases = false
         @specialEscapedJsonRegexs = {
-          Regexp.new(/,(( *)(\\*)("*)( *)),/m) => "\1,"
+          Regexp.new(/,(( *)(\\+)("*)( *)),/) => "\1,"
         }
       end
 
